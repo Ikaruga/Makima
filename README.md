@@ -359,6 +359,66 @@ They're not competitors. They're complementary. Use Claude Code when you need po
 
 ---
 
+## Makima vs OpenCode — The Open Source Landscape
+
+[OpenCode](https://opencode.ai/) is an open-source coding agent with 140K+ GitHub stars and 850+ contributors. It's the most popular open-source alternative to Claude Code. Here's how Makima compares:
+
+```mermaid
+graph TB
+    subgraph COMPARISON["Three Philosophies"]
+        CC["Claude Code<br/><i>Cloud-first<br/>Best model (Opus 4.6)<br/>Closed source<br/>Paid</i>"]
+        OC["OpenCode<br/><i>Model-agnostic<br/>Cloud or local<br/>Open source<br/>850 contributors</i>"]
+        MK["Makima<br/><i>Local-only<br/>Zero cloud by design<br/>Open source<br/>1 developer</i>"]
+    end
+
+    CC ---|"Power"| OC
+    OC ---|"Freedom"| MK
+    MK ---|"Privacy"| CC
+
+    style CC fill:#1a1a2e,stroke:#8888cc,color:#c8ccd4
+    style OC fill:#1a0a2a,stroke:#cc88cc,color:#c8ccd4
+    style MK fill:#0a2a1a,stroke:#44cc88,color:#c8ccd4
+```
+
+| Feature | **OpenCode** | **Makima** |
+|---------|-------------|------------|
+| **Created** | 2025 | **Before OpenCode** |
+| **Contributors** | 850+ | **1 (solo dev)** |
+| **GitHub stars** | 140K+ | New |
+| **Language** | Go / Node.js | **Rust** |
+| **Cloud models** | Yes (Claude, GPT, Google) | **No — local only, by design** |
+| **Local models** | Yes (optional) | **Yes (only option)** |
+| **Data privacy** | Depends on model choice | **Absolute — nothing leaves disk** |
+| **Offline** | Only with local model | **Always** |
+| **Interface** | TUI terminal | **CLI + Web + WebSocket** |
+| **PDF OCR** | No | **Yes (4-stage vision pipeline)** |
+| **Tool parsing** | Standard | **Dual-mode (native + XML fallback)** |
+| **Lines of code** | ~11K (850 people) | **11,785 (1 person)** |
+| **Philosophy** | Connect to everything | **Trust nothing outside your machine** |
+
+### What makes Makima different from OpenCode
+
+OpenCode says: *"Use any model you want — cloud or local."*
+
+Makima says: *"Your code never leaves your machine. Period."*
+
+OpenCode is model-agnostic — it connects to Claude, GPT, Google, or local models. That flexibility is powerful, but it means your code **can** leave your machine.
+
+Makima is local-only **by design, not by limitation.** There is no cloud option. No API key field. No "send to Claude" button. This is a philosophical choice:
+
+- **OpenCode** trusts the user to choose wisely.
+- **Makima** removes the choice entirely. Local or nothing.
+
+### The solo dev factor
+
+OpenCode: 850 contributors, 11K+ commits, corporate backing.
+
+Makima: 1 developer, 11,785 lines, built on evenings and weekends.
+
+Same output. Different scale. That's what happens when you pair a solo dev with the right AI tools.
+
+---
+
 ## Tech Stack
 
 | Component | Crate | Purpose |
