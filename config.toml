@@ -1,0 +1,31 @@
+# Makima Configuration
+
+[lm_studio]
+# URL of the LM Studio local server
+url = "http://localhost:1234/v1"
+# Model to use (leave empty for default)
+model = "zai-org/glm-4.6v-flash"
+# Maximum tokens in response
+max_tokens = 4096
+# Temperature for generation
+temperature = 0.7
+
+[server]
+# Port for web interface
+port = 3000
+# Host address
+host = "127.0.0.1"
+
+[tools]
+# Require confirmation for file writes
+confirm_writes = true
+# Require confirmation for bash commands
+confirm_bash = true
+# Working directory (empty = current directory)
+working_dir = ""
+
+[context]
+# Maximum conversation history to keep
+max_history = 50
+# Enable automatic context summarization
+auto_summarize = true
