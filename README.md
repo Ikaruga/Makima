@@ -282,21 +282,80 @@ Real-time streaming via WebSocket — see tokens appear as they're generated, ju
 
 ---
 
-## Comparison with Cloud Assistants
+## Makima vs Claude Code — Honest Comparison
 
-| Feature | Claude Code | GitHub Copilot | **Makima** |
-|---------|-------------|----------------|------------|
-| **Where it runs** | Cloud (Anthropic) | Cloud (GitHub/OpenAI) | **Your machine** |
-| **Model** | Claude (proprietary) | GPT-4/Codex | **Any LM Studio model** |
-| **Cost** | $20+/month | $10/month | **Free** |
-| **Data privacy** | Code sent to cloud | Code sent to cloud | **Never leaves disk** |
-| **Offline** | No | No | **Yes** |
-| **Custom model** | No | No | **Yes (any GGUF)** |
-| **Tool execution** | Yes (13 tools) | Limited | **Yes (13 tools)** |
-| **PDF OCR** | No | No | **Yes (vision model)** |
-| **Web interface** | No (CLI only) | VS Code plugin | **Yes (Axum + WebSocket)** |
-| **Confirmation flow** | Yes | No | **Yes** |
-| **Open source** | No | No | **Yes (MIT)** |
+Makima was built before Claude Code existed as a public CLI. They solve the same problem differently.
+
+```mermaid
+graph LR
+    subgraph CLOUD["Cloud Approach — Claude Code"]
+        CC_USER["Developer"]
+        CC_CLI["Claude Code CLI"]
+        CC_API["Anthropic Cloud<br/><i>Claude Opus 4.6<br/>1M tokens context</i>"]
+        CC_USER --> CC_CLI -->|"Code sent<br/>to cloud"| CC_API
+    end
+
+    subgraph LOCAL["Local Approach — Makima"]
+        M_USER["Developer"]
+        M_CLI["Makima CLI/Web"]
+        M_LMS["LM Studio<br/><i>Any model<br/>localhost:1234</i>"]
+        M_USER --> M_CLI -->|"Everything<br/>stays local"| M_LMS
+    end
+
+    style CLOUD fill:#1a1a2e,stroke:#8888cc,color:#8888cc
+    style LOCAL fill:#0a2a1a,stroke:#44cc88,color:#44cc88
+```
+
+### Feature comparison
+
+| Feature | Claude Code (Anthropic) | **Makima** (ours) |
+|---------|-------------------------|-------------------|
+| **Where it runs** | Cloud | **Local (your machine)** |
+| **Model** | Claude only (proprietary) | **Any model** (Qwen, GLM, Llama, Mistral...) |
+| **Model quality** | Superior (Opus 4.6, 1M context) | Good (14B local, 8-32K context) |
+| **Cost** | ~$20+/month | **Free forever** |
+| **Data privacy** | Code sent to Anthropic servers | **Never leaves your disk** |
+| **Offline** | No (requires internet) | **Yes (fully offline)** |
+| **Custom model** | No | **Yes (any GGUF via LM Studio)** |
+| **Tool count** | 15+ tools | **13 tools** |
+| **PDF OCR** | No native support | **Yes (4-stage pipeline + vision model)** |
+| **Web interface** | No (CLI only) | **Yes (Axum + WebSocket streaming)** |
+| **IDE integration** | VS Code, JetBrains | Not yet |
+| **MCP support** | Yes | Not yet |
+| **Hooks** | Yes | Not yet |
+| **Auto-memory** | Yes (key-value, cross-session) | Not yet (planned) |
+| **Sub-agents** | Yes (parallel) | Not yet |
+| **Context window** | 1M tokens | 8-32K (model dependent) |
+| **Confirmation flow** | Yes | **Yes** |
+| **Open source** | No | **Yes (MIT, 11,785 lines)** |
+| **Dual-mode parsing** | Not needed (own API) | **Yes (native + XML fallback)** |
+
+### Where Makima wins
+
+- **Privacy** — Your code never leaves your machine. Period.
+- **Cost** — Free. No subscription, no API key, no usage limits.
+- **Offline** — Works without internet. Train, plane, cabin in the woods.
+- **Model freedom** — Try Qwen today, switch to Llama tomorrow. Your choice.
+- **PDF OCR** — Multi-stage pipeline with vision model. Claude Code can't do this.
+- **Web UI** — Real-time WebSocket streaming in a browser. Claude Code is CLI-only.
+- **Open source** — Read every line. Modify anything. Fork it.
+
+### Where Claude Code wins
+
+- **Model quality** — Claude Opus 4.6 is significantly more capable than any 14B local model.
+- **Context** — 1M tokens vs 8-32K. Not even close.
+- **Ecosystem** — MCP, hooks, IDE plugins, sub-agents, auto-memory.
+- **Reliability** — Battle-tested by thousands of developers.
+
+### The bottom line
+
+Claude Code is a **Formula 1** — fast, powerful, expensive, needs a track (internet).
+
+Makima is a **Land Rover** — slower, but goes anywhere, runs on anything, and you own it.
+
+They're not competitors. They're complementary. Use Claude Code when you need power. Use Makima when you need privacy, freedom, or you're offline.
+
+*We built Makima while using Claude Code. That says it all.*
 
 ---
 
