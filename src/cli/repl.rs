@@ -28,6 +28,23 @@ fn estimate_tokens(text: &str) -> usize {
     (text.len() + 3) / 4
 }
 
+/// Filtre les modeles d'embedding (text-embedding-*, *-embed-*, etc.)
+fn is_embedding_model(name: &str) -> bool {
+    let n = name.to_lowercase();
+    n.contains("embed") || n.contains("embedding") || n.contains("reranker")
+}
+
+/// Choisit le modele texte a utiliser parmi ceux loades dans LM Studio.
+/// Priorite : si le modele configure est loade → on le garde. Sinon, premier non-embedding.
+fn pick_loaded_text_model<'a>(models: &'a [String], configured: &str) -> Option<&'a String> {
+    if !configured.is_empty() {
+        if let Some(m) = models.iter().find(|m| m.as_str() == configured) {
+            return Some(m);
+        }
+    }
+    models.iter().find(|m| !is_embedding_model(m))
+}
+
 /// Resume intelligent des arguments d'un tool call pour l'affichage
 fn format_tool_header(call: &crate::llm::types::ParsedToolCall) -> String {
     match call.name.as_str() {
@@ -247,6 +264,20 @@ impl Repl {
         }
 
         self.ui.success("Connecte a LM Studio");
+
+        // Auto-detect : si le modele configure n'est pas loade, prendre le premier loade
+        match self.client.list_models().await {
+            Ok(models) if !models.is_empty() => {
+                let configured = self.client.model().to_string();
+                if let Some(picked) = pick_loaded_text_model(&models, &configured) {
+                    if picked != &configured {
+                        self.client.set_model(picked);
+                        self.ui.info(&format!("Auto-detect : modele texte = {}", picked));
+                    }
+                }
+            }
+            _ => {}
+        }
 
         if let Some(ref project) = self.project {
             self.ui.info(&format!("Project: {} ({})", project.name, project.project_type.map(|t| t.as_str()).unwrap_or("Unknown")));
@@ -576,6 +607,27 @@ impl Repl {
                     Err(e) => {
                         self.ui.error(&format!("Impossible de recuperer la liste: {}", e));
                     }
+                }
+            }
+            "/auto" => {
+                match self.client.list_models().await {
+                    Ok(models) if !models.is_empty() => {
+                        let current = self.client.model().to_string();
+                        match models.iter().find(|m| !is_embedding_model(m)) {
+                            Some(picked) if picked != &current => {
+                                self.client.set_model(picked);
+                                self.ui.success(&format!("Modele texte bascule sur : {}", picked));
+                            }
+                            Some(_) => {
+                                self.ui.info(&format!("Deja sur le bon modele : {}", current));
+                            }
+                            None => {
+                                self.ui.warning("Aucun modele texte loade dans LM Studio (que des embeddings)");
+                            }
+                        }
+                    }
+                    Ok(_) => self.ui.warning("Aucun modele loade dans LM Studio"),
+                    Err(e) => self.ui.error(&format!("Impossible de recuperer la liste: {}", e)),
                 }
             }
             "/modele" | "/model" => {
