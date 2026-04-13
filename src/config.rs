@@ -19,12 +19,19 @@ pub struct Config {
 pub struct LmStudioConfig {
     /// API URL
     pub url: String,
-    /// Model name (empty = default)
+    /// Model name (empty = default) — utilise pour le texte
     pub model: String,
+    /// Modele vision pour OCR/PDF (utilise automatiquement par les outils qui ont besoin d'images)
+    #[serde(default = "default_vision_model")]
+    pub vision_model: String,
     /// Max tokens in response
     pub max_tokens: u32,
     /// Temperature for generation
     pub temperature: f32,
+}
+
+fn default_vision_model() -> String {
+    "zai-org/glm-4.6v-flash".to_string()
 }
 
 /// Web server configuration
@@ -76,6 +83,7 @@ impl Default for Config {
             lm_studio: LmStudioConfig {
                 url: "http://localhost:1234/v1".to_string(),
                 model: String::new(),
+                vision_model: default_vision_model(),
                 max_tokens: 4096,
                 temperature: 0.7,
             },

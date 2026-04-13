@@ -445,6 +445,8 @@ impl CliUI {
             ("/nouveau", "Demarrer une nouvelle conversation"),
             ("/espace", "Changer l'espace de travail"),
             ("/outils", "Lister les outils disponibles"),
+            ("/modeles", "Lister les modeles disponibles dans LM Studio"),
+            ("/modele <nom>", "Changer le modele texte (vision auto si besoin d'image)"),
             ("/plan", "Passer en mode Plan (exploration seulement)"),
             ("/edit", "Passer en mode Edit (execution autorisee)"),
             ("/configuration", "Afficher la configuration actuelle"),

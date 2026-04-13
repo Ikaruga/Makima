@@ -48,16 +48,20 @@ pub struct LmStudioClient {
     client: Client,
     base_url: String,
     model: String,
+    /// Modele vision (OCR/PDF) — utilise par les methodes ocr_image*
+    vision_model: String,
     max_tokens: u32,
     temperature: f32,
 }
 
 impl LmStudioClient {
     pub fn new(base_url: impl Into<String>, model: impl Into<String>) -> Self {
+        let model_str = model.into();
         Self {
             client: Client::new(),
             base_url: base_url.into(),
-            model: model.into(),
+            vision_model: model_str.clone(),
+            model: model_str,
             max_tokens: 4096,
             temperature: 0.7,
         }
@@ -73,9 +77,25 @@ impl LmStudioClient {
         self
     }
 
+    /// Definit le modele vision utilise pour les operations OCR/PDF
+    pub fn with_vision_model(mut self, vision_model: impl Into<String>) -> Self {
+        self.vision_model = vision_model.into();
+        self
+    }
+
+    /// Change le modele texte a chaud
+    pub fn set_model(&mut self, model: impl Into<String>) {
+        self.model = model.into();
+    }
+
     /// Get the model name
     pub fn model(&self) -> &str {
         &self.model
+    }
+
+    /// Get the vision model name
+    pub fn vision_model(&self) -> &str {
+        &self.vision_model
     }
 
     /// Get max tokens setting
@@ -314,7 +334,7 @@ impl LmStudioClient {
         use crate::llm::types::{VisionChatRequest, VisionMessage};
 
         let request = VisionChatRequest {
-            model: self.model.clone(),
+            model: self.vision_model.clone(),
             messages: vec![
                 VisionMessage::system(
                     "You are an expert OCR assistant specialized in financial documents. \
@@ -374,7 +394,7 @@ impl LmStudioClient {
         use crate::llm::types::{VisionChatRequest, VisionMessage};
 
         let request = VisionChatRequest {
-            model: self.model.clone(),
+            model: self.vision_model.clone(),
             messages: vec![
                 VisionMessage::system(prompt),
                 VisionMessage::user_with_image_mime(

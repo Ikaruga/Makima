@@ -33,6 +33,7 @@ pub struct AppState {
 impl AppState {
     pub fn new(config: Config) -> Self {
         let client = LmStudioClient::new(&config.lm_studio.url, &config.lm_studio.model)
+            .with_vision_model(&config.lm_studio.vision_model)
             .with_max_tokens(config.lm_studio.max_tokens)
             .with_temperature(config.lm_studio.temperature);
 
@@ -47,6 +48,7 @@ impl AppState {
         // Create a separate client for OCR (tools need their own Arc)
         let ocr_client = Arc::new(
             LmStudioClient::new(&config.lm_studio.url, &config.lm_studio.model)
+                .with_vision_model(&config.lm_studio.vision_model)
                 .with_max_tokens(config.lm_studio.max_tokens)
                 .with_temperature(config.lm_studio.temperature)
         );

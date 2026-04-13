@@ -168,6 +168,7 @@ pub struct Repl {
 impl Repl {
     pub async fn new(config: &Config) -> Result<Self> {
         let client = LmStudioClient::new(&config.lm_studio.url, &config.lm_studio.model)
+            .with_vision_model(&config.lm_studio.vision_model)
             .with_max_tokens(config.lm_studio.max_tokens)
             .with_temperature(config.lm_studio.temperature);
 
@@ -183,6 +184,7 @@ impl Repl {
         // Wrap client in Arc for sharing with tools (OCR)
         let client_arc = std::sync::Arc::new(
             LmStudioClient::new(&config.lm_studio.url, &config.lm_studio.model)
+                .with_vision_model(&config.lm_studio.vision_model)
                 .with_max_tokens(config.lm_studio.max_tokens)
                 .with_temperature(config.lm_studio.temperature)
         );
@@ -472,7 +474,7 @@ impl Repl {
     async fn handle_command(&mut self, command: &str) -> Result<bool> {
         let parts: Vec<&str> = command.splitn(2, ' ').collect();
         let cmd = parts[0].to_lowercase();
-        let _args = parts.get(1).copied();
+        let args = parts.get(1).copied();
 
         match cmd.as_str() {
             "/exit" | "/quit" | "/q" | "/quitter" => {
@@ -549,6 +551,61 @@ impl Repl {
             "/mode" => {
                 self.ui.header("Mode Actuel");
                 self.ui.status_bar(self.mode);
+            }
+            "/modeles" | "/models" => {
+                self.ui.header("Modeles Disponibles (LM Studio)");
+                match self.client.list_models().await {
+                    Ok(models) => {
+                        let current = self.client.model();
+                        let vision = self.client.vision_model();
+                        for m in &models {
+                            let tag_text = if m == current && m == vision {
+                                " (texte + vision)".green().to_string()
+                            } else if m == current {
+                                " (texte)".green().to_string()
+                            } else if m == vision {
+                                " (vision)".cyan().to_string()
+                            } else {
+                                String::new()
+                            };
+                            println!("  {}{}", m, tag_text);
+                        }
+                        println!();
+                        self.ui.info("Utilisez /modele <nom> pour changer le modele texte");
+                    }
+                    Err(e) => {
+                        self.ui.error(&format!("Impossible de recuperer la liste: {}", e));
+                    }
+                }
+            }
+            "/modele" | "/model" => {
+                match args {
+                    None | Some("") => {
+                        self.ui.header("Modeles actuels");
+                        println!("  Texte : {}", self.client.model().green());
+                        println!("  Vision: {}", self.client.vision_model().cyan());
+                        println!();
+                        self.ui.info("Usage: /modele <nom>  (tapez /modeles pour la liste)");
+                    }
+                    Some(name) => {
+                        let name = name.trim();
+                        // Verifier que le modele existe dans LM Studio
+                        match self.client.list_models().await {
+                            Ok(models) => {
+                                if models.iter().any(|m| m == name) {
+                                    self.client.set_model(name);
+                                    self.ui.success(&format!("Modele texte change : {}", name));
+                                } else {
+                                    self.ui.warning(&format!("Modele '{}' non trouve dans LM Studio", name));
+                                    self.ui.info("Tapez /modeles pour voir les modeles disponibles");
+                                }
+                            }
+                            Err(e) => {
+                                self.ui.error(&format!("Impossible de verifier le modele: {}", e));
+                            }
+                        }
+                    }
+                }
             }
             "/espace" | "/workdir" => {
                 let current_dir = std::env::current_dir()

@@ -3,8 +3,10 @@
 [lm_studio]
 # URL of the LM Studio local server
 url = "http://localhost:1234/v1"
-# Model to use (leave empty for default)
-model = "zai-org/glm-4.6v-flash"
+# Model to use (leave empty for default) — modele texte
+model = "google/gemma-4-e4b"
+# Modele vision (OCR/PDF). Utilise automatiquement quand un outil a besoin d'images.
+vision_model = "zai-org/glm-4.6v-flash"
 # Maximum tokens in response
 max_tokens = 4096
 # Temperature for generation
