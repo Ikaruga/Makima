@@ -92,36 +92,38 @@ async fn pre_launch_checks(config: &mut Config) -> Result<()> {
 
     // 2. Choose max_tokens
     println!();
-    println!("Fenetre de contexte (max tokens) :");
-    println!("  {} 4096   - Rapide, echanges courts", "[1]".cyan());
-    println!("  {} 8192   - Conversations longues", "[2]".cyan());
-    println!("  {} 32768  - Documents volumineux", "[3]".cyan());
-    println!("  {} 131072 - Contexte maximum (131K)", "[4]".cyan());
+    println!("Longueur max d'une reponse (max_tokens) :");
+    println!("  {} 2048   - Reponses courtes (rapide)", "[1]".cyan());
+    println!("  {} 4096   - Equilibre (defaut recommande)", "[2]".cyan());
+    println!("  {} 8192   - Reponses longues / generation de code", "[3]".cyan());
+    println!("  {} 16384  - Tres long (gros refactors, docs)", "[4]".cyan());
     println!();
-    println!("  {} Plus la valeur est elevee, plus le modele peut traiter de texte", "ℹ".blue());
-    println!("    en une fois, mais les reponses seront plus lentes.");
-    print!("{} Choix [1/2/3/4, defaut=1]: ", "▶".green());
+    println!("  {} Ceci est la taille max d'UNE reponse, PAS la fenetre de contexte.", "ℹ".blue());
+    println!("    La fenetre de contexte se regle dans LM Studio (Context Length).");
+    println!("    Astuce : garde max_tokens << context_length pour laisser de la place");
+    println!("    a l'historique de conversation.");
+    print!("{} Choix [1/2/3/4, defaut=2]: ", "▶".green());
     io::stdout().flush()?;
 
     let mut choice = String::new();
     io::stdin().read_line(&mut choice)?;
 
     match choice.trim() {
-        "2" => {
+        "1" => {
+            config.lm_studio.max_tokens = 2048;
+            println!("{} Max tokens: 2048", "✓".green());
+        }
+        "3" => {
             config.lm_studio.max_tokens = 8192;
             println!("{} Max tokens: 8192", "✓".green());
         }
-        "3" => {
-            config.lm_studio.max_tokens = 32768;
-            println!("{} Max tokens: 32768", "✓".green());
-        }
         "4" => {
-            config.lm_studio.max_tokens = 131072;
-            println!("{} Max tokens: 131072 (131K)", "✓".green());
+            config.lm_studio.max_tokens = 16384;
+            println!("{} Max tokens: 16384", "✓".green());
         }
         _ => {
             config.lm_studio.max_tokens = 4096;
-            println!("{} Max tokens: 4096", "✓".green());
+            println!("{} Max tokens: 4096 (defaut)", "✓".green());
         }
     }
     println!();

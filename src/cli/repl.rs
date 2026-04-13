@@ -609,6 +609,31 @@ impl Repl {
                     }
                 }
             }
+            "/max_tokens" | "/maxtokens" => {
+                match args {
+                    None | Some("") => {
+                        self.ui.header("Longueur max d'une reponse");
+                        println!("  Actuel : {} tokens", self.client.max_tokens().to_string().green());
+                        println!();
+                        self.ui.info("Usage: /max_tokens <n>  (ex: 4096, 8192, 16384)");
+                        self.ui.info("C'est la taille max d'UNE reponse, PAS la fenetre de contexte (LM Studio).");
+                    }
+                    Some(val) => {
+                        match val.trim().parse::<u32>() {
+                            Ok(n) if n >= 256 && n <= 200_000 => {
+                                self.client.set_max_tokens(n);
+                                self.ui.success(&format!("max_tokens = {}", n));
+                            }
+                            Ok(_) => {
+                                self.ui.warning("Valeur hors plage. Recommande : 256 a 200000.");
+                            }
+                            Err(_) => {
+                                self.ui.warning("Valeur invalide. Exemple : /max_tokens 8192");
+                            }
+                        }
+                    }
+                }
+            }
             "/auto" => {
                 match self.client.list_models().await {
                     Ok(models) if !models.is_empty() => {

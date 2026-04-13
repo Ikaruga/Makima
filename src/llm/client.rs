@@ -72,6 +72,11 @@ impl LmStudioClient {
         self
     }
 
+    /// Change la longueur max d'une reponse a chaud
+    pub fn set_max_tokens(&mut self, max_tokens: u32) {
+        self.max_tokens = max_tokens;
+    }
+
     pub fn with_temperature(mut self, temperature: f32) -> Self {
         self.temperature = temperature;
         self

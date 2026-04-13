@@ -448,6 +448,7 @@ impl CliUI {
             ("/modeles", "Lister les modeles disponibles dans LM Studio"),
             ("/modele <nom>", "Changer le modele texte (vision auto si besoin d'image)"),
             ("/auto", "Detecter et utiliser le modele actuellement loade dans LM Studio"),
+            ("/max_tokens <n>", "Changer la longueur max d'une reponse (defaut 4096)"),
             ("/plan", "Passer en mode Plan (exploration seulement)"),
             ("/edit", "Passer en mode Edit (execution autorisee)"),
             ("/configuration", "Afficher la configuration actuelle"),
