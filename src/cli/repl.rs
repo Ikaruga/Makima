@@ -9,7 +9,8 @@ use crate::llm::{generate_tool_prompt, generate_akari_prompt, LmStudioClient, St
 use crate::tools::{ToolExecutor, ToolRegistry};
 use anyhow::Result;
 use colored::*;
-use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use crossterm::event::{self, DisableBracketedPaste, EnableBracketedPaste, Event, KeyCode, KeyModifiers};
+use crossterm::execute;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use std::collections::HashSet;
 use std::io::{self, Write};
@@ -368,12 +369,31 @@ impl Repl {
             return Ok(Some(input));
         }
 
+        // Enable bracketed paste so multi-line paste arrives as Event::Paste
+        // au lieu d'etre interprete comme plein de KeyCode::Enter
+        let _ = execute!(io::stdout(), EnableBracketedPaste);
+
         loop {
             if event::poll(std::time::Duration::from_millis(100))? {
                 let evt = event::read()?;
                 if let Event::Resize(_, _) = evt {
                     // Terminal resized: redraw the fixed panel
                     self.ui.redraw_fixed_panel();
+                    self.ui.move_to_prompt_input(input.len());
+                    continue;
+                }
+                // Paste (multi-ligne ou non) : on remplace les sauts de ligne par espaces
+                // pour rester sur une seule ligne d'input.
+                if let Event::Paste(pasted) = evt {
+                    if self.history_index.is_some() {
+                        self.history_index = None;
+                    }
+                    let cleaned: String = pasted
+                        .chars()
+                        .map(|c| if c == '\n' || c == '\r' { ' ' } else { c })
+                        .collect();
+                    input.push_str(&cleaned);
+                    self.ui.update_prompt_line(&input);
                     self.ui.move_to_prompt_input(input.len());
                     continue;
                 }
@@ -436,6 +456,7 @@ impl Repl {
                         }
                         // Enter = submit
                         (_, KeyCode::Enter) => {
+                            let _ = execute!(io::stdout(), DisableBracketedPaste);
                             let _ = disable_raw_mode();
                             // Save to history if not empty and different from last entry
                             let trimmed = input.trim().to_string();
@@ -454,6 +475,7 @@ impl Repl {
                         }
                         // Ctrl+C = cancel
                         (modifiers, KeyCode::Char('c')) if modifiers.contains(KeyModifiers::CONTROL) => {
+                            let _ = execute!(io::stdout(), DisableBracketedPaste);
                             let _ = disable_raw_mode();
                             input.clear();
                             self.ui.update_prompt_line("");
@@ -461,6 +483,7 @@ impl Repl {
                         }
                         // Ctrl+D = exit
                         (modifiers, KeyCode::Char('d')) if modifiers.contains(KeyModifiers::CONTROL) => {
+                            let _ = execute!(io::stdout(), DisableBracketedPaste);
                             let _ = disable_raw_mode();
                             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "EOF"));
                         }
