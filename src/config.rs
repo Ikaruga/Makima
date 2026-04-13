@@ -50,7 +50,7 @@ pub enum ToolSet {
     /// Outils standards de Makima
     #[default]
     Standard,
-    /// Outils Akari (灯) — optimises pour GLM-4.6V, inspires de Claude Code
+    /// Outils Akari (灯) — outils enrichis style Claude Code avec web_fetch/web_search
     Akari,
 }
 

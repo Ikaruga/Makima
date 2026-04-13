@@ -1,6 +1,7 @@
-//! Outils Akari (灯) — Optimises pour GLM-4.6V avec function calling natif
-//! Inspires de l'approche Claude Code, avec des schemas ameliores
-//! et des descriptions optimisees pour les modeles de vision.
+//! Outils Akari (灯) — Outils enrichis style Claude Code, function calling natif
+//! Schemas precis et descriptions soignees, + web_fetch et web_search.
+//! Compatibles avec tout modele supportant les tool_calls : GLM-4.6V, Gemma-4,
+//! Qwen-Coder, etc.
 
 use super::registry::{Tool, ToolResult};
 use crate::llm::types::ParsedToolCall;

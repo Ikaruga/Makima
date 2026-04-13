@@ -133,11 +133,12 @@ async fn pre_launch_checks(config: &mut Config) -> Result<()> {
     };
     println!("Jeu d'outils (actuel: {}):", current);
     println!("  {} Outils standards  - Les outils actuels de Makima", "[1]".cyan());
-    println!("  {} Outils Akari ({}) - Optimises pour GLM-4.6V, inspires de Claude Code",
+    println!("  {} Outils Akari ({}) - Outils enrichis style Claude Code, + web_fetch/web_search",
         "[2]".cyan(), "灯".yellow());
     println!();
-    println!("  {} Les outils Akari incluent web_fetch, web_search, et des schemas", "ℹ".blue());
-    println!("    ameliores pour le function calling natif de GLM-4.6V.");
+    println!("  {} Les outils Akari ajoutent web_fetch et web_search, et ont des schemas", "ℹ".blue());
+    println!("    plus precis. Compatibles avec tout modele supportant le function calling");
+    println!("    (GLM-4.6V, Gemma-4, Qwen-Coder, etc.).");
     print!("{} Choix [1/2, defaut=actuel]: ", "▶".green());
     io::stdout().flush()?;
 
